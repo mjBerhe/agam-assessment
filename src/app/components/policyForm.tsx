@@ -82,7 +82,7 @@ export const PolicyForm: React.FC = () => {
   const handleClick = () => {
     mutation.mutate({
       fund1Return: parseFloat(fund1Return) / 100,
-      fund2Return: parseFloat(fund1Return) / 100,
+      fund2Return: parseFloat(fund2Return) / 100,
     });
   };
 
