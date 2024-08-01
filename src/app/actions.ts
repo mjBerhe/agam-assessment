@@ -9,8 +9,13 @@ const DEFAULT_FUND2_RETURN = 0.035;
 export const fetchPolicyData = async (params: PolicyParams) => {
   const { incYears, fund1Return, fund2Return } = params;
 
+  const baseURI =
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:5258"
+      : "https://agam-api.azurewebsites.net";
+
   const response = await fetch(
-    `http://localhost:5258/policy?incYears=${incYears ?? DEFAULT_INC_YEARS}&fund1Return=${fund1Return ?? DEFAULT_FUND1_RETURN}&fund2Return=${fund2Return ?? DEFAULT_FUND2_RETURN}`,
+    `${baseURI}/policy?incYears=${incYears ?? DEFAULT_INC_YEARS}&fund1Return=${fund1Return ?? DEFAULT_FUND1_RETURN}&fund2Return=${fund2Return ?? DEFAULT_FUND2_RETURN}`,
     {
       cache: "no-store",
     },
