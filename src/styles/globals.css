@@ -4,11 +4,11 @@
 
 main {
   background-image: linear-gradient(
-    to right,
-    #0c2c5a,
-    #102551,
-    #111f48,
-    #121840,
-    #111237
+    to right bottom,
+    #1a2432,
+    #171f2d,
+    #151a29,
+    #121624,
+    #10101f
   );
 }
