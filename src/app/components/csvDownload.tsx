@@ -32,6 +32,10 @@ const columns = [
     id: "fundFees",
     displayName: "M&E/Fund Fees",
   },
+  // {
+  //   id: "onlyFundFees",
+  //   displayname: "Fund Fees",
+  // },
   {
     id: "avPreWithdrawal",
     displayName: "AV Pre-Withdrawal ",
@@ -183,6 +187,14 @@ const columns = [
   {
     id: "finalRiderCharges",
     displayName: "Rider Charges",
+  },
+  {
+    id: "finalFundFees",
+    displayName: "Fund Fees",
+  },
+  {
+    id: "totalInterestCredited",
+    displayName: "Total Interest Credited",
   },
 ];
 
