@@ -9,7 +9,7 @@ import Providers from "./providers";
 export const metadata: Metadata = {
   title: "Agam Assessment",
   description: "Agam Assessment",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  // icons: [{ rel: "icon", url: "" }],
 };
 
 const raleway = Raleway({ subsets: ["latin"] });
