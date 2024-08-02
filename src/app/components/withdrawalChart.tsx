@@ -2,7 +2,7 @@
 
 import type { Policy } from "./policyForm";
 import * as React from "react";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import {
   type ChartConfig,
   ChartContainer,
@@ -24,21 +24,23 @@ export const WithdrawalChart: React.FC<{ data: Policy }> = ({ data }) => {
   const chartData = [
     ...data.policyRecords.map((x) => ({
       date: x.year,
-      withdrawalAmount: x.withdrawalAmount,
+      withdrawalAmount: Math.round(x.withdrawalAmount),
     })),
   ];
 
   return (
-    <div>
-      <div className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
+    <div className="w-full">
+      <div className="flex flex-col items-stretch space-y-0 border-b p-0 sm:h-[120px] sm:flex-row">
+        <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:w-[350px] sm:py-6">
           <h1 className="text-lg font-bold">Withdrawal Amount ($) vs Years</h1>
-          <span className="text-sm">
-            over last {data.policyRecords.length - 1} years
+          <span className="text-sm text-gray-400">
+            *big change in withdrawals usually indicates when the account is
+            empty (withdrawal claims are maxed out)
+            {/* over last {data.policyRecords.length - 1} years */}
           </span>
         </div>
-        <div className="flex">
-          <div className="data-[active=true]:bg-muted/50 relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l sm:border-l sm:border-t-0 sm:px-8 sm:py-6">
+        <div className="flex sm:w-[225px]">
+          <div className="flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left sm:border-l sm:border-t-0 sm:px-8 sm:py-6">
             <span className="text-sm">Present Value WB Claims</span>
             <span className="text-lg font-bold leading-none sm:text-3xl">
               {Math.round(data.cumulativeWithdrawalClaims).toLocaleString()}
@@ -65,7 +67,7 @@ export const WithdrawalChart: React.FC<{ data: Policy }> = ({ data }) => {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              minTickGap={40}
+              minTickGap={45}
               tickFormatter={(value: string) => value}
             />
             <ChartTooltip

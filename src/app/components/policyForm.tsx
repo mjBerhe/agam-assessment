@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 
 import { fetchPolicyData } from "../actions";
 import { CSVDownloadButton } from "./csvDownload";
 import { WithdrawalChart } from "./withdrawalChart";
 import { ReductionChart } from "./reductionChart";
-
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
+import { Fund2ReturnsChart } from "./fund2ReturnsChart";
+import { AccountValueChart } from "./accountValueChart";
+import { RiderDeathBenefitBaseChart } from "./riderDeathBenefitBaseChart";
 
 export type Policy = {
   age: number;
@@ -73,7 +75,8 @@ export type PolicyRecords = {
 }[];
 
 export type PolicyParams = {
-  incYears?: number;
+  initialAge?: number;
+  qxMultiplier?: number;
   fund1Return?: number;
   volatilityRate?: number;
   riskFreeRate?: number;
@@ -82,7 +85,11 @@ export type PolicyParams = {
 };
 
 export const PolicyForm: React.FC = () => {
+  const [error, setError] = useState("");
   const [data, setData] = useState<Policy>();
+
+  const [initialAge, setInitialAge] = useState<string>("60");
+  const [mortalityMultiplier, setMortalityMultiplier] = useState<string>("1");
 
   const [fund1Return, setFund1Return] = useState<string>("3");
   const [fund1Size, setFund1Size] = useState<string>("20");
@@ -97,15 +104,31 @@ export const PolicyForm: React.FC = () => {
     onSuccess: (data) => setData(data),
   });
 
+  console.log(error);
+
   const handleClick = () => {
-    mutation.mutate({
-      incYears: 40,
-      fund1Return: parseFloat(fund1Return) / 100,
-      volatilityRate: parseFloat(volatilityRate) / 100,
-      riskFreeRate: parseFloat(riskFreeRate) / 100,
-      fundFeeRate: parseFloat(fundFeeRate) / 100,
-      fund1Size: parseFloat(fund1Size) / 100,
-    });
+    if (
+      !initialAge ||
+      !mortalityMultiplier ||
+      !fund1Return ||
+      !volatilityRate ||
+      !riskFreeRate ||
+      !fundFeeRate ||
+      !fund1Size
+    ) {
+      setError("One or more input field is empty");
+    } else {
+      setError("");
+      mutation.mutate({
+        initialAge: Math.round(parseInt(initialAge)),
+        qxMultiplier: Math.round(parseInt(mortalityMultiplier)),
+        fund1Return: parseFloat(fund1Return) / 100,
+        volatilityRate: parseFloat(volatilityRate) / 100,
+        riskFreeRate: parseFloat(riskFreeRate) / 100,
+        fundFeeRate: parseFloat(fundFeeRate) / 100,
+        fund1Size: parseFloat(fund1Size) / 100,
+      });
+    }
   };
 
   const handleFundSize = (amount: string) => {
@@ -122,10 +145,38 @@ export const PolicyForm: React.FC = () => {
 
   return (
     <div className="flex w-full flex-col items-center justify-center">
-      <div className="flex w-full justify-center gap-x-12">
-        <div className="flex flex-col gap-y-8">
+      <div className="flex w-full justify-center space-x-12">
+        <div className="flex w-[150px] flex-col gap-y-8">
           <div className="flex flex-col gap-y-2">
-            <label className="text-base font-medium">Fund 1 Return</label>
+            <label className="font-medium">Starting Age</label>
+            <div className="flex items-center gap-x-2">
+              <input
+                type="number"
+                value={initialAge}
+                onChange={(e) => setInitialAge(e.currentTarget.value)}
+                className="w-[80px] rounded-lg bg-slate-600 px-3 py-1.5 text-lg text-white"
+              />
+              {/* <span className="text-lg">%</span> */}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-y-2">
+            <label className="font-medium">Mortality Multiplier</label>
+            <div className="flex items-center gap-x-2">
+              <input
+                type="number"
+                value={mortalityMultiplier}
+                onChange={(e) => setMortalityMultiplier(e.currentTarget.value)}
+                className="w-[80px] rounded-lg bg-slate-600 px-3 py-1.5 text-lg text-white"
+              />
+              {/* <span className="text-lg"></span> */}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex w-[150px] flex-col gap-y-8">
+          <div className="flex flex-col gap-y-2">
+            <label className="font-medium">Fund 1 Return</label>
             <div className="flex items-center gap-x-2">
               <input
                 type="number"
@@ -138,7 +189,7 @@ export const PolicyForm: React.FC = () => {
           </div>
 
           <div className="flex flex-col gap-y-2">
-            <label className="text-base font-medium">Fund 2 Volatility</label>
+            <label className="font-medium">Fund 2 Volatility</label>
             <div className="flex items-center gap-x-2">
               <input
                 type="number"
@@ -151,9 +202,9 @@ export const PolicyForm: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex flex-col gap-y-8">
+        <div className="flex w-[150px] flex-col gap-y-8">
           <div className="flex flex-col gap-y-2">
-            <label className="text-base font-medium">Fund 1 Distribution</label>
+            <label className="font-medium">Fund 1 Distribution</label>
             <div className="flex items-center gap-x-2">
               <input
                 type="number"
@@ -166,7 +217,7 @@ export const PolicyForm: React.FC = () => {
           </div>
 
           <div className="flex flex-col gap-y-2">
-            <label className="text-base font-medium">Fund 2 Distribution</label>
+            <label className="font-medium">Fund 2 Distribution</label>
             <div className="flex items-center gap-x-2">
               <input
                 type="number"
@@ -180,29 +231,31 @@ export const PolicyForm: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex flex-col gap-y-2">
-          <label className="text-lg font-medium">Risk Free Rate</label>
-          <div className="flex items-center gap-x-2">
-            <input
-              type="number"
-              value={riskFreeRate}
-              onChange={(e) => setRiskFreeRate(e.currentTarget.value)}
-              className="w-[80px] rounded-lg bg-slate-600 px-3 py-1.5 text-lg text-white"
-            />
-            <span className="text-lg">%</span>
+        <div className="flex w-[150px] flex-col gap-y-8">
+          <div className="flex flex-col gap-y-2">
+            <label className="font-medium">Risk Free Rate</label>
+            <div className="flex items-center gap-x-2">
+              <input
+                type="number"
+                value={riskFreeRate}
+                onChange={(e) => setRiskFreeRate(e.currentTarget.value)}
+                className="w-[80px] rounded-lg bg-slate-600 px-3 py-1.5 text-lg text-white"
+              />
+              <span className="text-lg">%</span>
+            </div>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-y-2">
-          <label className="text-lg font-medium">Fund Fee Rate</label>
-          <div className="flex items-center gap-x-2">
-            <input
-              type="number"
-              value={fundFeeRate}
-              onChange={(e) => setFundFeeRate(e.currentTarget.value)}
-              className="w-[80px] rounded-lg bg-slate-600 px-3 py-1.5 text-lg text-white"
-            />
-            <span className="text-lg">%</span>
+          <div className="flex flex-col gap-y-2">
+            <label className="font-medium">Fund Fee Rate</label>
+            <div className="flex items-center gap-x-2">
+              <input
+                type="number"
+                value={fundFeeRate}
+                onChange={(e) => setFundFeeRate(e.currentTarget.value)}
+                className="w-[80px] rounded-lg bg-slate-600 px-3 py-1.5 text-lg text-white"
+              />
+              <span className="text-lg">%</span>
+            </div>
           </div>
         </div>
       </div>
@@ -215,11 +268,13 @@ export const PolicyForm: React.FC = () => {
           Calculate
         </button>
       </div>
+
       {data && (
         <div className="mt-8 flex w-full flex-col items-center border-t border-slate-600 pt-8">
           <div className="flex w-full justify-evenly">
             <div className="flex w-full max-w-[300px] flex-col items-center justify-center">
-              <div className="text-3xl font-bold">Results</div>
+              <h1 className="text-3xl font-bold">Results</h1>
+              <span className="text-gray-400">100k initial premium</span>
               <div className="mt-4 flex w-full flex-col gap-y-2">
                 <div className="flex w-full items-center">
                   <span className="text-lg">PV DB Claim:</span>
@@ -257,9 +312,18 @@ export const PolicyForm: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex w-full max-w-[600px]">
+            <div className="flex w-full max-w-[650px]">
               <TabGroup>
-                <TabList className="flex gap-x-4">
+                <TabList className="flex gap-x-3">
+                  <Tab className="rounded-full px-3 py-1 text-sm/6 font-semibold text-white focus:outline-none data-[hover]:bg-white/5 data-[selected]:bg-white/10 data-[selected]:data-[hover]:bg-white/10 data-[focus]:outline-1 data-[focus]:outline-white">
+                    Account Value
+                  </Tab>
+                  <Tab className="rounded-full px-3 py-1 text-sm/6 font-semibold text-white focus:outline-none data-[hover]:bg-white/5 data-[selected]:bg-white/10 data-[selected]:data-[hover]:bg-white/10 data-[focus]:outline-1 data-[focus]:outline-white">
+                    Death Benefit Base
+                  </Tab>
+                  <Tab className="rounded-full px-3 py-1 text-sm/6 font-semibold text-white focus:outline-none data-[hover]:bg-white/5 data-[selected]:bg-white/10 data-[selected]:data-[hover]:bg-white/10 data-[focus]:outline-1 data-[focus]:outline-white">
+                    Fund 2 Returns
+                  </Tab>
                   <Tab className="rounded-full px-3 py-1 text-sm/6 font-semibold text-white focus:outline-none data-[hover]:bg-white/5 data-[selected]:bg-white/10 data-[selected]:data-[hover]:bg-white/10 data-[focus]:outline-1 data-[focus]:outline-white">
                     Withdrawals
                   </Tab>
@@ -268,6 +332,15 @@ export const PolicyForm: React.FC = () => {
                   </Tab>
                 </TabList>
                 <TabPanels className="mt-3">
+                  <TabPanel>
+                    <AccountValueChart data={data} />
+                  </TabPanel>
+                  <TabPanel>
+                    <RiderDeathBenefitBaseChart data={data} />
+                  </TabPanel>
+                  <TabPanel>
+                    <Fund2ReturnsChart data={data} />
+                  </TabPanel>
                   <TabPanel>
                     <WithdrawalChart data={data} />
                   </TabPanel>

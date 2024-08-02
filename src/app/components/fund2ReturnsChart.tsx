@@ -11,39 +11,40 @@ import {
 } from "./ui/chart";
 
 const chartConfig = {
-  reductions: {
-    label: "Reduction Amount",
+  returns: {
+    label: "Fund 2 Return (%)",
   },
-  reductionAmount: {
-    label: "Account Reduction Amount",
-    color: "hsl(var(--chart-1))",
+  fund2Return: {
+    label: "Return",
+    color: "hsl(var(--chart-4))",
   },
 } satisfies ChartConfig;
 
-export const ReductionChart: React.FC<{ data: Policy }> = ({ data }) => {
+export const Fund2ReturnsChart: React.FC<{ data: Policy }> = ({ data }) => {
   const chartData = [
     ...data.policyRecords.map((x) => ({
       date: x.year,
-      reductionAmount: Math.round(
-        x.fundFees + x.riderCharge + x.deathPayments + x.withdrawalAmount,
-      ),
+      fund2Return: Math.round(x.fund2Return * 100),
     })),
   ];
 
+  const totalFund2Returns = chartData.reduce((a, b) => a + b.fund2Return, 0);
+  const avgFund2Returns = totalFund2Returns / chartData.length;
+
   return (
     <div className="w-full">
-      <div className="flex flex-col items-stretch space-y-0 border-b p-0 sm:h-[120px] sm:flex-row">
+      <div className="flex flex-col items-stretch border-b sm:h-[120px] sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:w-[350px] sm:py-6">
-          <h1 className="text-lg font-bold">Account Reduction ($) vs Years</h1>
+          <h1 className="text-lg font-bold">Fund 2 Returns (%) vs Years</h1>
           <span className="text-sm text-gray-400">
-            *includes fund fees, death payments, rider charges and withdrawals
+            over last {data.policyRecords.length - 1} years
           </span>
         </div>
         <div className="flex sm:w-[225px]">
           <div className="flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left sm:border-l sm:border-t-0 sm:px-8 sm:py-6">
-            <span className="text-sm">Present Value RC Claims</span>
+            <span className="text-sm">Average Fund 2 Returns</span>
             <span className="text-lg font-bold leading-none sm:text-3xl">
-              {Math.round(data.cumulativeRiderCharges).toLocaleString()}
+              {(Math.round(avgFund2Returns * 100) / 100).toLocaleString()} %
             </span>
           </div>
         </div>
@@ -68,13 +69,13 @@ export const ReductionChart: React.FC<{ data: Policy }> = ({ data }) => {
               axisLine={false}
               tickMargin={8}
               minTickGap={45}
-              tickFormatter={(value: string) => value}
+              tickFormatter={(value: string) => `${value}`}
             />
             <ChartTooltip
               content={
                 <ChartTooltipContent
                   className="w-[200px] bg-slate-700/80"
-                  nameKey="reductions"
+                  nameKey="returns"
                   labelFormatter={(value: string, x: unknown) => {
                     // @ts-expect-error payload is being weird but I know it exists
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -83,10 +84,7 @@ export const ReductionChart: React.FC<{ data: Policy }> = ({ data }) => {
                 />
               }
             />
-            <Bar
-              dataKey="reductionAmount"
-              fill={`var(--color-${`reductionAmount`})`}
-            />
+            <Bar dataKey="fund2Return" fill={`var(--color-${`fund2Return`})`} />
           </BarChart>
         </ChartContainer>
       </div>
