@@ -5,6 +5,10 @@ import { useMutation } from "@tanstack/react-query";
 
 import { fetchPolicyData } from "../actions";
 import { CSVDownloadButton } from "./csvDownload";
+import { WithdrawalChart } from "./withdrawalChart";
+import { ReductionChart } from "./reductionChart";
+
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 
 export type Policy = {
   age: number;
@@ -213,17 +217,66 @@ export const PolicyForm: React.FC = () => {
       </div>
       {data && (
         <div className="mt-8 flex w-full flex-col items-center border-t border-slate-600 pt-8">
-          <div className="text-xl">Policy for age 60-{data.age}</div>
-          <span>age: {data?.age}</span>
-          <span>PV DB Claim: {Math.round(data?.cumulativeDeathClaims)}</span>
-          <span>
-            PV WB Claim: {Math.round(data?.cumulativeWithdrawalClaims)}
-          </span>
-          <span>PV RC: {Math.round(data?.cumulativeRiderCharges)}</span>
-          <span>PV Fund Fees: {Math.round(data?.cumulativeFundFees)}</span>
+          <div className="flex w-full justify-evenly">
+            <div className="flex w-full max-w-[300px] flex-col items-center justify-center">
+              <div className="text-3xl font-bold">Results</div>
+              <div className="mt-4 flex w-full flex-col gap-y-2">
+                <div className="flex w-full items-center">
+                  <span className="text-lg">PV DB Claim:</span>
+                  <span className="ml-auto text-2xl font-bold">
+                    {Math.round(data?.cumulativeDeathClaims).toLocaleString()}
+                  </span>
+                </div>
 
-          <div className="mt-4">
-            <CSVDownloadButton data={data.policyRecords} />
+                <div className="flex w-full items-center">
+                  <span className="text-lg">PV WB Claim:</span>
+                  <span className="ml-auto text-2xl font-bold">
+                    {Math.round(
+                      data?.cumulativeWithdrawalClaims,
+                    ).toLocaleString()}
+                  </span>
+                </div>
+
+                <div className="flex w-full items-center">
+                  <span className="text-lg">PV RC:</span>
+                  <span className="ml-auto text-2xl font-bold">
+                    {Math.round(data?.cumulativeRiderCharges).toLocaleString()}
+                  </span>
+                </div>
+
+                <div className="flex w-full items-center">
+                  <span className="text-lg">PV Fund Fees:</span>
+                  <span className="ml-auto text-2xl font-bold">
+                    {Math.round(data?.cumulativeFundFees).toLocaleString()}
+                  </span>
+                </div>
+
+                <div className="mt-4 flex w-full justify-center">
+                  <CSVDownloadButton data={data.policyRecords} />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex w-full max-w-[600px]">
+              <TabGroup>
+                <TabList className="flex gap-x-4">
+                  <Tab className="rounded-full px-3 py-1 text-sm/6 font-semibold text-white focus:outline-none data-[hover]:bg-white/5 data-[selected]:bg-white/10 data-[selected]:data-[hover]:bg-white/10 data-[focus]:outline-1 data-[focus]:outline-white">
+                    Withdrawals
+                  </Tab>
+                  <Tab className="rounded-full px-3 py-1 text-sm/6 font-semibold text-white focus:outline-none data-[hover]:bg-white/5 data-[selected]:bg-white/10 data-[selected]:data-[hover]:bg-white/10 data-[focus]:outline-1 data-[focus]:outline-white">
+                    Reductions
+                  </Tab>
+                </TabList>
+                <TabPanels className="mt-3">
+                  <TabPanel>
+                    <WithdrawalChart data={data} />
+                  </TabPanel>
+                  <TabPanel>
+                    <ReductionChart data={data} />
+                  </TabPanel>
+                </TabPanels>
+              </TabGroup>
+            </div>
           </div>
         </div>
       )}

@@ -209,7 +209,7 @@ export const CSVDownloadButton: React.FC<{ data: PolicyRecords }> = ({
         columns={columns}
         datas={[...policyRecords] as []}
         filename="policyRecords"
-        className="flex justify-center rounded-lg border py-2"
+        className="flex justify-center rounded-lg border px-8 py-2 hover:bg-slate-800/50"
       >
         Download as CSV
       </CsvDownloader>
