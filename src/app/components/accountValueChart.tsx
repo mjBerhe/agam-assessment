@@ -2,7 +2,7 @@
 
 import type { Policy } from "./policyForm";
 import * as React from "react";
-import { CartesianGrid, XAxis, Line, LineChart } from "recharts";
+import { CartesianGrid, XAxis, Line, LineChart, YAxis } from "recharts";
 import {
   type ChartConfig,
   ChartContainer,
@@ -68,6 +68,7 @@ export const AccountValueChart: React.FC<{ data: Policy }> = ({ data }) => {
               minTickGap={45}
               tickFormatter={(value: string) => `${value}`}
             />
+            <YAxis tickMargin={8} width={45} />
             <ChartTooltip
               content={
                 <ChartTooltipContent

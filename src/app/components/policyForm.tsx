@@ -104,8 +104,6 @@ export const PolicyForm: React.FC = () => {
     onSuccess: (data) => setData(data),
   });
 
-  console.log(error);
-
   const handleClick = () => {
     if (
       !initialAge ||
@@ -116,24 +114,49 @@ export const PolicyForm: React.FC = () => {
       !fundFeeRate ||
       !fund1Size
     ) {
-      setError("One or more input field is empty");
-    } else {
-      setError("");
-      mutation.mutate({
-        initialAge: Math.round(parseInt(initialAge)),
-        qxMultiplier: Math.round(parseInt(mortalityMultiplier)),
-        fund1Return: parseFloat(fund1Return) / 100,
-        volatilityRate: parseFloat(volatilityRate) / 100,
-        riskFreeRate: parseFloat(riskFreeRate) / 100,
-        fundFeeRate: parseFloat(fundFeeRate) / 100,
-        fund1Size: parseFloat(fund1Size) / 100,
-      });
+      setError("One or more input field is empty/invalid");
+      return;
     }
+    if (parseFloat(initialAge) < 40 || parseFloat(initialAge) > 80) {
+      setError("Please ensure starting age is between 40 and 80");
+      return;
+    }
+    if (parseFloat(volatilityRate) < 0) {
+      setError("Please ensure fund 2 volatility is at least 0%");
+      return;
+    }
+    if (parseFloat(mortalityMultiplier) < 0) {
+      setError("Please ensure mortalility multiplier is at least 0%");
+      return;
+    }
+    if (parseFloat(fund1Return) < 0) {
+      setError("Please ensure fund 1 return is at least 0%");
+      return;
+    }
+    if (parseFloat(riskFreeRate) < 0) {
+      setError("Please ensure risk free rate is at least 0%");
+      return;
+    }
+    if (parseFloat(fundFeeRate) < 0) {
+      setError("Please ensure fund fee rate is at least 0%");
+      return;
+    }
+
+    setError("");
+    mutation.mutate({
+      initialAge: Math.round(parseInt(initialAge)),
+      qxMultiplier: Math.round(parseInt(mortalityMultiplier)),
+      fund1Return: parseFloat(fund1Return) / 100,
+      volatilityRate: parseFloat(volatilityRate) / 100,
+      riskFreeRate: parseFloat(riskFreeRate) / 100,
+      fundFeeRate: parseFloat(fundFeeRate) / 100,
+      fund1Size: parseFloat(fund1Size) / 100,
+    });
   };
 
   const handleFundSize = (amount: string) => {
     const x = parseFloat(amount);
-    if (x < 100 && x >= 0) {
+    if (x <= 100 && x >= 0) {
       setFund1Size(x.toString());
       setFund2Size((100 - x).toString());
     }
@@ -156,7 +179,6 @@ export const PolicyForm: React.FC = () => {
                 onChange={(e) => setInitialAge(e.currentTarget.value)}
                 className="w-[80px] rounded-lg bg-slate-600 px-3 py-1.5 text-lg text-white"
               />
-              {/* <span className="text-lg">%</span> */}
             </div>
           </div>
 
@@ -165,11 +187,11 @@ export const PolicyForm: React.FC = () => {
             <div className="flex items-center gap-x-2">
               <input
                 type="number"
+                step={0.1}
                 value={mortalityMultiplier}
                 onChange={(e) => setMortalityMultiplier(e.currentTarget.value)}
                 className="w-[80px] rounded-lg bg-slate-600 px-3 py-1.5 text-lg text-white"
               />
-              {/* <span className="text-lg"></span> */}
             </div>
           </div>
         </div>
@@ -180,6 +202,7 @@ export const PolicyForm: React.FC = () => {
             <div className="flex items-center gap-x-2">
               <input
                 type="number"
+                step={0.1}
                 value={fund1Return}
                 onChange={(e) => setFund1Return(e.currentTarget.value)}
                 className="w-[80px] rounded-lg bg-slate-600 px-3 py-1.5 text-lg text-white"
@@ -193,6 +216,7 @@ export const PolicyForm: React.FC = () => {
             <div className="flex items-center gap-x-2">
               <input
                 type="number"
+                step={0.1}
                 value={volatilityRate}
                 onChange={(e) => setFundVolatilityRate(e.currentTarget.value)}
                 className="w-[80px] rounded-lg bg-slate-600 px-3 py-1.5 text-lg text-white"
@@ -237,6 +261,7 @@ export const PolicyForm: React.FC = () => {
             <div className="flex items-center gap-x-2">
               <input
                 type="number"
+                step={0.1}
                 value={riskFreeRate}
                 onChange={(e) => setRiskFreeRate(e.currentTarget.value)}
                 className="w-[80px] rounded-lg bg-slate-600 px-3 py-1.5 text-lg text-white"
@@ -250,6 +275,7 @@ export const PolicyForm: React.FC = () => {
             <div className="flex items-center gap-x-2">
               <input
                 type="number"
+                step={0.01}
                 value={fundFeeRate}
                 onChange={(e) => setFundFeeRate(e.currentTarget.value)}
                 className="w-[80px] rounded-lg bg-slate-600 px-3 py-1.5 text-lg text-white"
@@ -260,10 +286,11 @@ export const PolicyForm: React.FC = () => {
         </div>
       </div>
 
-      <div className="mt-12">
+      <div className="mt-12 flex flex-col items-center justify-center gap-y-2">
+        {error && <span className="text-red-300">{error}</span>}
         <button
           onClick={handleClick}
-          className="flex justify-center rounded-lg border px-8 py-2 hover:bg-slate-800/50"
+          className="flexjustify-center rounded-lg border px-8 py-2 hover:bg-slate-800/50"
         >
           Calculate
         </button>

@@ -2,7 +2,7 @@
 
 import type { Policy } from "./policyForm";
 import * as React from "react";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
   type ChartConfig,
   ChartContainer,
@@ -35,7 +35,7 @@ export const WithdrawalChart: React.FC<{ data: Policy }> = ({ data }) => {
           <h1 className="text-lg font-bold">Withdrawal Amount ($) vs Years</h1>
           <span className="text-sm text-gray-400">
             *big change in withdrawals usually indicates when the account is
-            empty (withdrawal claims are maxed out)
+            empty (withdrawals are maxed out)
             {/* over last {data.policyRecords.length - 1} years */}
           </span>
         </div>
@@ -70,6 +70,7 @@ export const WithdrawalChart: React.FC<{ data: Policy }> = ({ data }) => {
               minTickGap={45}
               tickFormatter={(value: string) => value}
             />
+            <YAxis tickMargin={8} width={45} />
             <ChartTooltip
               content={
                 <ChartTooltipContent

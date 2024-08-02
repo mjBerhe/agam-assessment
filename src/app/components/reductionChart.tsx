@@ -70,6 +70,7 @@ export const ReductionChart: React.FC<{ data: Policy }> = ({ data }) => {
               minTickGap={45}
               tickFormatter={(value: string) => value}
             />
+            <YAxis tickMargin={8} width={45} />
             <ChartTooltip
               content={
                 <ChartTooltipContent

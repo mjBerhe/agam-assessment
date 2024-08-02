@@ -71,6 +71,13 @@ export const Fund2ReturnsChart: React.FC<{ data: Policy }> = ({ data }) => {
               minTickGap={45}
               tickFormatter={(value: string) => `${value}`}
             />
+            <YAxis
+              tickCount={3}
+              domain={[-50, 50]}
+              tickMargin={8}
+              width={45}
+              allowDataOverflow
+            />
             <ChartTooltip
               content={
                 <ChartTooltipContent

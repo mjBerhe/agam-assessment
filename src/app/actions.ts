@@ -27,7 +27,7 @@ export const fetchPolicyData = async (params: PolicyParams) => {
       : "https://agam-api.azurewebsites.net";
 
   const URI = `${baseURI}/policy?initialAge=${initialAge ?? DEFAULT_INITIAL_AGE}&qxMultiplier=${qxMultiplier ?? DEFAULT_QX_MULTIPLIER}&fund1Return=${fund1Return ?? DEFAULT_FUND1_RETURN}&volatilityRate=${volatilityRate ?? DEFAULT_VOLATILITY_RATE}&riskFreeRate=${riskFreeRate ?? DEFAULT_RISK_FREE_RATE}&fundFeeRate=${fundFeeRate ?? DEFAULT_FUND_FEE_RATE}&fund1Size=${fund1Size ?? DEFAULT_FUND1_SIZE}`;
-  console.log(URI);
+  // console.log(URI);
 
   const response = await fetch(URI, {
     cache: "no-store",
